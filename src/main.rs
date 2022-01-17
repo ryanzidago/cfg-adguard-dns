@@ -102,3 +102,17 @@ fn update_resolvconf() {
         .output()
         .expect("failed to update resolvconf");
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn get_path_function_returns_the_resolvconf_head_env_var_value_if_it_is_set() {
+        if let Ok(value) = env::var(RESOLVCONF_HEAD_ENV_VAR) {
+            assert_eq!(get_path(), value)
+        } else {
+            assert_eq!(get_path(), RESOLVCONF_HEAD_DEFAULT_PATH)
+        }
+    }
+}
