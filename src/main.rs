@@ -12,7 +12,10 @@ const DEFAULT_TEMPLATE: &str = "
 # run \"systemd-resolve --status\" to see details about the actual nameservers.
 ";
 
-const ADGUARD_DNS_SERVER: &str = "
+const DNS_SERVER_1_ADDR: &str = "94.140.14.14";
+const DNS_SERVER_2_ADDR: &str = "94.149.15.15";
+
+const ADGUARD_DNS_SERVER_CONFIG: &str = "
 # AdGuard DNS 
 # https://adguard-dns.com/en/public-dns.html
 nameserver 94.140.14.14
@@ -24,6 +27,7 @@ Usage: sudo rslvconf [options...]
 
         --activate      Activate AdGuard DNS server 
         --deactivate    Deactivate AdGuard DNS server 
+        --status        Shows wether AdGuard DNS server is activated or not
         --verbose       Add verbose output to `--activate` and `--deactivate` commands
         --help          Display the current help message
 ";
@@ -32,14 +36,13 @@ fn main() -> Result<(), Error> {
     let mut file = File::create(RESOLVCONF_HEAD_PATH)?;
     let args: Vec<_> = env::args().collect();
 
-    println!("args: {:#?}", args);
-
     match args.len() {
         1 => println!("{}", HELP_MESSAGE),
         _ => match &args[1][..] {
             "--help" => println!("{}", HELP_MESSAGE),
             "--activate" | "activate" => activate_adguard_dns(&mut file),
             "--deactivate" | "deactivate" => deactivate_adguard_dns(&mut file),
+            "--status" | "status" => show_status(),
             _ => eprintln!("Unknown argument. Try `rslvconf --help` for more information"),
         },
     }
@@ -57,8 +60,27 @@ fn deactivate_adguard_dns(file: &mut File) {
     update_resolvconf();
 }
 
+fn show_status() {
+    let output = std::process::Command::new("nslookup")
+        .arg("wikipedia.org")
+        .output()
+        .expect("failed to execute nslookup");
+
+    if let Ok(output_as_string) = String::from_utf8(output.stdout) {
+        if output_as_string.contains(&DNS_SERVER_1_ADDR.to_string())
+            || output_as_string.contains(&DNS_SERVER_2_ADDR)
+        {
+            println!("ADGUARD DNS is activated")
+        } else {
+            println!("ADGUARD DNS is deactivated")
+        }
+    } else {
+        eprintln!("nslookup is not installed or could not lookup wikipedia.org")
+    };
+}
+
 fn write_default_template_with_adguard_dns(file: &mut File) {
-    let content = format!("{} {}", DEFAULT_TEMPLATE, ADGUARD_DNS_SERVER);
+    let content = format!("{} {}", DEFAULT_TEMPLATE, ADGUARD_DNS_SERVER_CONFIG);
     write!(file, "{}", content).expect("failed to write default template");
 }
 
