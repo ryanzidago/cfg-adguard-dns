@@ -7,5 +7,6 @@ Usage: sudo rslvconf [options...]
 
         --activate      Activate AdGuard DNS server 
         --deactivate    Deactivate AdGuard DNS server 
+        --status        Shows wether AdGuard DNS server is activated or not
         --help          Display the current help message
 ```
