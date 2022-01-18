@@ -75,10 +75,8 @@ fn show_status() {
         .output()
         .expect("failed to execute nslookup");
 
-    if let Ok(output_as_string) = String::from_utf8(output.stdout) {
-        if output_as_string.contains(&DNS_SERVER_1_ADDR.to_string())
-            || output_as_string.contains(&DNS_SERVER_2_ADDR)
-        {
+    if let Ok(output) = String::from_utf8(output.stdout) {
+        if contains_server_1_or_2_config(output) {
             println!("ADGUARD DNS is activated")
         } else {
             println!("ADGUARD DNS is deactivated")
@@ -86,6 +84,11 @@ fn show_status() {
     } else {
         eprintln!("nslookup is not installed or could not lookup wikipedia.org")
     };
+}
+
+fn contains_server_1_or_2_config(output: String) -> bool {
+    output.contains(&DNS_SERVER_1_ADDR.to_string())
+        || output.contains(&DNS_SERVER_2_ADDR.to_string())
 }
 
 fn write_default_template_with_adguard_dns(file: &mut File) {
