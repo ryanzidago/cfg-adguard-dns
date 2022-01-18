@@ -24,7 +24,7 @@ nameserver 94.149.15.15
 ";
 
 const HELP_MESSAGE: &str = "
-Usage: sudo rslvconf [options...]
+Usage: sudo cfg-adguard-dns [options...]
 
         --activate      Activate AdGuard DNS server 
         --deactivate    Deactivate AdGuard DNS server 
@@ -45,7 +45,7 @@ fn main() -> Result<(), Error> {
             "--activate" | "activate" => activate_adguard_dns(&mut file),
             "--deactivate" | "deactivate" => deactivate_adguard_dns(&mut file),
             "--status" | "status" => show_status(),
-            _ => eprintln!("Unknown argument. Try `rslvconf --help` for more information"),
+            _ => eprintln!("Unknown argument. Try `cfg-adguard-dns --help` for more information"),
         },
     }
 
