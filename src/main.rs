@@ -30,6 +30,8 @@ Usage: sudo rslvconf [options...]
         --deactivate    Deactivate AdGuard DNS server 
         --status        Shows wether AdGuard DNS server is activated or not
         --help          Display the current help message
+
+Disclaimer: Using this tool will restore the /etc/resolvconf/resolv.conf.d/head file to its default state.
 ";
 
 fn main() -> Result<(), Error> {
