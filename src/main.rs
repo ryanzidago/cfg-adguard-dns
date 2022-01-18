@@ -33,7 +33,6 @@ Usage: sudo rslvconf [options...]
 ";
 
 fn main() -> Result<(), Error> {
-    println!("GET_PATH {}", get_path());
     let mut file = File::create(get_path())?;
     let args: Vec<_> = env::args().collect();
 
@@ -106,6 +105,10 @@ fn update_resolvconf() {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
+
+    const RESOLVCONF_HEAD_ENV_VAR: &str = "RESOLVCONF_HEAD_PATH";
+    const RESOLVCONF_HEAD_DEFAULT_PATH: &str = "/etc/resolvconf/resolv.conf.d/head";
 
     #[test]
     fn get_path_function_returns_the_resolvconf_head_env_var_value_if_it_is_set() {
@@ -114,5 +117,35 @@ mod tests {
         } else {
             assert_eq!(get_path(), RESOLVCONF_HEAD_DEFAULT_PATH)
         }
+    }
+
+    #[test]
+    fn activate_adguard_dns_test() -> std::io::Result<()> {
+        let mut file = File::create("test_file_with_adguard_dns").unwrap();
+
+        activate_adguard_dns(&mut file);
+
+        match fs::read_to_string("test_file_with_adguard_dns") {
+            Ok(content) => assert!(content.contains(ADGUARD_DNS_SERVER_CONFIG)),
+            Err(_) => panic!("test failed"),
+        };
+
+        fs::remove_file("test_file_with_adguard_dns")?;
+        Ok(())
+    }
+
+    #[test]
+    fn deactivate_adguard_dns_test() -> std::io::Result<()> {
+        let mut file = File::create("test_file_without_adguard_dns").unwrap();
+
+        deactivate_adguard_dns(&mut file);
+
+        match fs::read_to_string("test_file_without_adguard_dns") {
+            Ok(content) => assert!(!content.contains(ADGUARD_DNS_SERVER_CONFIG)),
+            Err(_) => panic!("test failed"),
+        };
+
+        fs::remove_file("test_file_without_adguard_dns")?;
+        Ok(())
     }
 }
