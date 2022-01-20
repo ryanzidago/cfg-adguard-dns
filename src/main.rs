@@ -62,11 +62,15 @@ fn get_path() -> String {
 fn activate_adguard_dns(file: &mut File) {
     write_default_template_with_adguard_dns(file);
     update_resolvconf();
+
+    println!("AdGuard DNS successfully activated");
 }
 
 fn deactivate_adguard_dns(file: &mut File) {
     write_default_template(file);
     update_resolvconf();
+
+    println!("AdGuard DNS successfully deactivated");
 }
 
 fn show_status() {
@@ -77,9 +81,9 @@ fn show_status() {
 
     if let Ok(output) = String::from_utf8(output.stdout) {
         if contains_server_1_or_2_config(output) {
-            println!("ADGUARD DNS is activated")
+            println!("AdGuard DNS is activated")
         } else {
-            println!("ADGUARD DNS is deactivated")
+            println!("AdGuard DNS is deactivated")
         }
     } else {
         eprintln!("nslookup is not installed or could not lookup wikipedia.org")
