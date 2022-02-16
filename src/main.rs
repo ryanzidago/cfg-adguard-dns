@@ -105,10 +105,17 @@ fn write_default_template(file: &mut File) {
 }
 
 fn update_resolvconf() {
-    Command::new("resolvconf")
+    let output = Command::new("resolvconf")
         .arg("-u")
         .output()
         .expect("failed to update resolvconf");
+
+    if !output.stderr.is_empty() {
+        match std::str::from_utf8(&output.stderr) {
+            Ok(err) => panic!("{}", err),
+            Err(err) => panic!("Invalid UTF-8 sequence: {}", err),
+        }
+    }
 }
 
 #[cfg(test)]
